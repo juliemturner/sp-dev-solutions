@@ -1,8 +1,9 @@
 import * as React from 'react';
 import styles from '../SearchNavigationWebPart.module.scss';
 import { ISearchNavigationContainerProps } from './ISearchNavigationContainerProps';
-import { INavigationNodeProps } from '../../SearchNavigationWebPart';
 import { ISearchNavigationContainerState } from './ISearchNavigationContainerState';
+import { INavigationNodeProps } from '../../../../models/INavigationNodeProps';
+import { QueryPathBehavior, PageOpenBehavior } from '../../../../helpers/UrlHelper';
 
 export default class SearchNavigationContainer extends React.Component<ISearchNavigationContainerProps, ISearchNavigationContainerState> {
 
@@ -30,27 +31,41 @@ export default class SearchNavigationContainer extends React.Component<ISearchNa
     }
 
     private isNodeSelected(url: string) {
-        return (document.location.href.toLocaleLowerCase().indexOf(encodeURI(url).toLocaleLowerCase()) > -1);
+        return (this.props.currentPageUrl.toLocaleLowerCase().indexOf(encodeURI(url).toLocaleLowerCase()) > -1);
     }
 
-
     private renderPivotElement(node: INavigationNodeProps, idx: number) {
-        const queryParam = this.props.queryKeywords && this.props.queryKeywords.length > 0 ? `?q=${this.props.queryKeywords}` : '';
+        const searchUrl = new URL(node.url);
+        const openBehavior = this.props.openBehavior === PageOpenBehavior.NewTab ? '_blank' : '_self';
+
+        if (this.props.passQuery && this.props.queryKeywords && this.props.queryKeywords.length > 0) {
+            const urlEncodedQueryText = encodeURIComponent(this.props.queryKeywords);
+            if (this.props.queryPathBehavior === QueryPathBehavior.URLFragment) {
+              searchUrl.hash = urlEncodedQueryText;
+            }
+            else {
+              searchUrl.searchParams.append(this.props.queryStringParameter, urlEncodedQueryText);
+            }
+        }
+
         const isSelected = this.isNodeSelected(node.url);
+
         if (this.props.useThemeColor) {
-          return this.getThemeElement(node, queryParam, isSelected);
+          return this.getThemeElement(node, searchUrl.href, openBehavior, isSelected, idx);
         } else {
-          return this.getCustomElement(node, queryParam, isSelected, idx);
+          return this.getCustomElement(node, searchUrl.href, openBehavior, isSelected, idx);
         }
     }
 
-    private getThemeElement(node, queryParam, isSelected) {
+    private getThemeElement(node: INavigationNodeProps, searchUrl: string, openBehavior: string, isSelected: boolean, idx: number) {
         const selectedStyle = isSelected ? styles.selected : styles.regular;
         return (
-            <div className={` ${styles.nodeParent} ${selectedStyle}`} >
+            <div className={` ${styles.nodeParent} ${selectedStyle}`} key={`node-${idx}`}>
                 <a
                     className={`${styles.nodeText} `}
-                    href={node.url + queryParam}>
+                    target={openBehavior}
+                    data-interception="off"
+                    href={searchUrl}>
                     {node.displayText}
                 </a>
                 <div className={styles.underline} />
@@ -58,10 +73,10 @@ export default class SearchNavigationContainer extends React.Component<ISearchNa
         );
     }
 
-    private getCustomElement(node, queryParam, isSelected, idx ) {
-        let selectedClass;
+    private getCustomElement(node: INavigationNodeProps, searchUrl: string, openBehavior: string, isSelected: boolean, idx: number) {
+        let selectedClass: string;
         let color = this.props.color ? this.props.color : '#ee0410';
-        let colorStyle;
+        let colorStyle: React.CSSProperties;
         if (isSelected) {
             selectedClass = styles.selected;
             colorStyle = { color: color };
@@ -70,10 +85,12 @@ export default class SearchNavigationContainer extends React.Component<ISearchNa
             colorStyle = this.state.hoverItemIndex === idx ? { color: color } : {};
         }
         return (
-            <div className={`${selectedClass} ${styles.nodeParent}`} >
+            <div className={`${selectedClass} ${styles.nodeParent}`} key={`node-${idx}`}>
                 <a
                     className={`${styles.nodeText}`}
-                    href={node.url + queryParam}
+                    href={searchUrl}
+                    target={openBehavior}
+                    data-interception="off"
                     style={colorStyle}
                     onMouseOver={() => this.setHover(idx)}
                     onMouseOut={() => this.setHover(undefined)}>

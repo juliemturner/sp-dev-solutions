@@ -4,12 +4,8 @@
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
 import { Environment, EnvironmentType, Version } from '@microsoft/sp-core-library';
-import {
-  BaseClientSideWebPart,
-  IPropertyPaneConfiguration,
-  PropertyPaneTextField,
-  PropertyPaneCheckbox
-} from '@microsoft/sp-webpart-base';
+import { BaseClientSideWebPart } from "@microsoft/sp-webpart-base";
+import { IPropertyPaneConfiguration, PropertyPaneCheckbox, PropertyPaneTextField } from "@microsoft/sp-property-pane";
 import { escape } from '@microsoft/sp-lodash-subset';
 import * as strings from 'inventoryCheckOutWebPartStrings';
 import { IInventoryCheckOutWebPartWebPartProps } from './IInventoryCheckOutWebPartWebPartProps';
@@ -19,7 +15,7 @@ import { ProvisionManager } from './provisioning/ProvisionManager';
 import { IInventoryCheckOutDataProvider } from './dataProviders/IInventoryCheckOutDataProvider';
 import { InventoryCheckOutDataProvider } from './dataProviders/InventoryCheckOutDataProvider';
 import { MockInventoryCheckOutDataProvider } from './dataProviders/MockInventoryCheckOutDataProvider';
-
+import { sp } from '../../pnp-preset';
 
 export default class InventoryCheckOutWebPartWebPart extends BaseClientSideWebPart<IInventoryCheckOutWebPartWebPartProps> {
   private _isInitialized: boolean = false;
@@ -29,6 +25,8 @@ export default class InventoryCheckOutWebPartWebPart extends BaseClientSideWebPa
   private _dataProvider: IInventoryCheckOutDataProvider;
 
   protected async onInit(): Promise<void> {
+    sp.setup(this.context);
+
     this.context.statusRenderer.displayLoadingIndicator(this.domElement, "Loading List");
     this._location = escape(this.properties.locations);
     this._standardCheckoutLength = escape(this.properties.standardCheckoutLength);
@@ -42,11 +40,11 @@ export default class InventoryCheckOutWebPartWebPart extends BaseClientSideWebPa
       return super.onInit();
     } else {
       return ProvisionManager
-        .checkSPlistsExist(this.context)
+        .checkSPlistsExist()
         .then((prop: boolean) => {
           this.context.statusRenderer.clearLoadingIndicator(this.domElement);
           this._isInitialized = prop;
-          this._dataProvider = new InventoryCheckOutDataProvider(this.context);
+          this._dataProvider = new InventoryCheckOutDataProvider();
           return super.onInit();
         }, (er: any) => {
           this.context.statusRenderer.renderError(this.domElement, "Error checking Inventory lists!");

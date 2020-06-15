@@ -1,7 +1,7 @@
 import * as React from 'react';
-import * as Update from 'immutability-helper';
+import update from 'immutability-helper';
 import * as ca from "../../solutions/SharePointUtility";
-import { CommandButton, Label, css, PrimaryButton } from 'office-ui-fabric-react';
+import { CommandButton, css, PrimaryButton } from 'office-ui-fabric-react';
 import styles from './MyTimeAwayContainer.module.scss';
 import { IMyTimeAwayContainerProps } from './IMyTimeAwayContainerProps';
 import IMyTimeAwayContainerState from './IMyTimeAwayContainerState';
@@ -22,7 +22,7 @@ export class MyTimeAwayContainer extends React.Component<IMyTimeAwayContainerPro
       showDialogType: TimeAwayDialogType.Hidden,
       period: this.props.period,
       items: [],
-      isHaveAdminPermission: utility.checkCurrentUserIsAbleToManageList(this.props.context),
+      isHaveAdminPermission: utility.checkCurrentUserIsAbleToManageList(this.props.context.pageContext.web.permissions),
       submitting: false,
       isInitialized: this.props.isInitialized
     };
@@ -90,13 +90,13 @@ export class MyTimeAwayContainer extends React.Component<IMyTimeAwayContainerPro
 
   private _provisioningLists() {
     var utility = ca.SharePointUtilityModule.SharePointUtility;
-    this.setState(Update(this.state, {
+    this.setState(update(this.state, {
       submitting: { $set: true }
     }));
 
     TimeAwayManager.ensureSPListTimeAway(this.props.context)
       .then(() => {
-        this.setState(Update(this.state, {
+        this.setState(update(this.state, {
           isInitialized: { $set: true }
         }));
       });

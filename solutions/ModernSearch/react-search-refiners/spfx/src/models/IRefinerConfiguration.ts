@@ -1,7 +1,9 @@
-import RefinerTemplateOption from "./RefinerTemplateOption";
+import RefinersSortOption from './RefinersSortOptions';
+import RefinerTemplateOption from './RefinerTemplateOption';
+import RefinerSortDirection from './RefinersSortDirection';
 
 interface IRefinerConfiguration {
-    
+
     /**
      * The SharePoint refiner name
      */
@@ -17,6 +19,21 @@ interface IRefinerConfiguration {
      * The selected template for this refiner
      */
     template: RefinerTemplateOption;
+
+    /**
+     * How the refiner values should be sorted
+     */
+    refinerSortType: RefinersSortOption;
+
+    /**
+     * Direction of sorting values
+     */
+    refinerSortDirection: RefinerSortDirection;
+
+    /** 
+     * Allow refiners to be expanded by default
+     */
+    showExpanded: boolean;
 }
 
 export default IRefinerConfiguration;

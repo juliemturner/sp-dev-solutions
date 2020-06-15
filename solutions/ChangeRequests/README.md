@@ -10,8 +10,10 @@ There are two web parts included with Change Request Management:
 
 ![Issues Screenshot](./assets/screenshot.png)
 
+![Change management web parts set up as a personal Teams app](./assets/screenshot-teams.png)
+
 ## Used SharePoint Framework Version 
-![drop](https://img.shields.io/badge/version-v1.1-green.svg)
+![drop](https://img.shields.io/badge/version-v1.10-green.svg)
 
 ## Applies to
 
@@ -41,6 +43,8 @@ ChangeRequests               | Cindy Yan (Canviz)                               
 
 Version | Date               | Comments
 ------- | ------------------ | --------
+1.0.14  | May 7, 2020 | Updated solution to use PnPjs
+1.0.13  | April 9, 2020 | Update to SPFx v1.10
 1.0     | September 27, 2017 | Initial release
 
 ## Disclaimer

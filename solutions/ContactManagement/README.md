@@ -1,3 +1,18 @@
+---
+page_type: sample
+products:
+- office-sp
+languages:
+- javascript
+- typescript
+extensions:
+  contentType: samples
+  technologies:
+  - SharePoint Framework
+  platforms:
+  - react
+  createdDate: 10/1/2017 12:00:00 AM
+---
 # Contact Management
 
 ## Summary
@@ -5,8 +20,10 @@ The Contact Management application provides simplified management of contacts an
 
 ![Contact Management Screenshot](./assets/contactmanagement.png)
 
+![Contact Management as a personal Teams app](./assets/contactmanagement-teams.png)
+
 ## Used SharePoint Framework Version 
-![drop](https://img.shields.io/badge/version-v1.0-green.svg)
+![drop](https://img.shields.io/badge/version-v1.10-green.svg)
 
 ## Applies to
 
@@ -35,6 +52,7 @@ ContactManagement            | Cindy Yan (Canviz)                               
 
 Version  | Date               | Comments
 -------- | ------------------ | --------
+1.0.13   | April 17, 2020 | Updated to SharePoint Framework v1.10
 1.0      | September 27, 2017 | Initial release
 
 ## Disclaimer

@@ -2,6 +2,7 @@ import * as React from                                                 'react';
 import ISearchResultsTemplateProps from './ISearchResultsTemplateProps';
 import ISearchResultsTemplateState from './ISearchResultsTemplateState';
 import                                  './SearchResultsTemplate.scss';
+import { TemplateService } from '../../../../services/TemplateService/TemplateService';
 
 export default class SearchResultsTemplate extends React.Component<ISearchResultsTemplateProps, ISearchResultsTemplateState> {
 
@@ -28,10 +29,10 @@ export default class SearchResultsTemplate extends React.Component<ISearchResult
 
     public componentDidUpdate() {
         // Post render operations (previews on elements, etc.)
-        this.props.templateService.initPreviewElements();  
+        TemplateService.initPreviewElements();  
     }
 
-    public componentWillReceiveProps(nextProps: ISearchResultsTemplateProps) {
+    public UNSAFE_componentWillReceiveProps(nextProps: ISearchResultsTemplateProps) {
         this._updateTemplate(nextProps);
     }
 

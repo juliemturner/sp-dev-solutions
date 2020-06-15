@@ -6,10 +6,12 @@ import { DatePicker, IDatePickerProps } from "office-ui-fabric-react/lib/DatePic
 import { Link } from "office-ui-fabric-react/lib/Link";
 import * as update from 'immutability-helper';
 import * as strings from 'SearchRefinersWebPartStrings';
+import { Loader } from "../../../../../services/TemplateService/LoadHelper";
 
 export interface IDateRangeTemplateState extends IBaseRefinerTemplateState {
     selectedFromDate: Date;
     selectedToDate: Date;
+    haveMoment: boolean;
 }
 
 export interface IDateRangeTemplateProps extends IBaseRefinerTemplateProps {
@@ -24,7 +26,8 @@ export default class DateRangeTemplate extends React.Component<IDateRangeTemplat
         this.state = {
             refinerSelectedFilterValues: [],
             selectedFromDate: null,
-            selectedToDate: null
+            selectedToDate: null,
+            haveMoment: ((window as any).searchHBHelper) ? true : false
         };
 
         this._updateFromDate = this._updateFromDate.bind(this);
@@ -33,24 +36,25 @@ export default class DateRangeTemplate extends React.Component<IDateRangeTemplat
         this._clearFilters = this._clearFilters.bind(this);
         this._onFormatDate = this._onFormatDate.bind(this);
     }
-    
-    public render() {
 
-        const fromProps: IDatePickerProps  = {
+    public render() {
+        if (!this.state.haveMoment) return null;
+
+        const fromProps: IDatePickerProps = {
             placeholder: strings.Refiners.Templates.DateFromLabel,
-            onSelectDate:this._updateFromDate,
-            value:this.state.selectedFromDate,
-            showGoToToday:true,
-            borderless:true,
+            onSelectDate: this._updateFromDate,
+            value: this.state.selectedFromDate,
+            showGoToToday: true,
+            borderless: true,
             strings: strings.Refiners.Templates.DatePickerStrings
         };
 
         let toProps: IDatePickerProps = {
             placeholder: strings.Refiners.Templates.DateTolabel,
-            onSelectDate:this._updateToDate,
-            value:this.state.selectedToDate,
-            showGoToToday:true,
-            borderless:true,
+            onSelectDate: this._updateToDate,
+            value: this.state.selectedToDate,
+            showGoToToday: true,
+            borderless: true,
             strings: strings.Refiners.Templates.DatePickerStrings
         };
 
@@ -72,15 +76,22 @@ export default class DateRangeTemplate extends React.Component<IDateRangeTemplat
             fromProps.maxDate = maxDate;
         }
 
-        return  <div>
-                    <DatePicker {...fromProps}/>
-                    <DatePicker {...toProps}/>
-                    <Link onClick={this._clearFilters} disabled={!this.state.selectedToDate && !this.state.selectedFromDate}>{strings.Refiners.ClearFiltersLabel}</Link>
-                </div>;
+        return <div>
+            <DatePicker {...fromProps} />
+            <DatePicker {...toProps} />
+            <Link onClick={this._clearFilters} disabled={!this.state.selectedToDate && !this.state.selectedFromDate}>{strings.Refiners.ClearFiltersLabel}</Link>
+        </div>;
+    }
+
+    public async componentWillMount() {
+        if (!this.state.haveMoment) {
+            await Loader.LoadHandlebarsHelpers();
+            this.setState({ haveMoment: true });
+        }
     }
 
     public componentDidMount() {
-        
+
         // This scenario happens due to the behavior of the Office UI Fabric GroupedList component who recreates child components when a greoup is collapsed/expanded, causing a state reset for sub components
         // In this case we use the refiners global state to recreate the 'local' state for this component
         if (this.props.selectedValues.length === 1) {
@@ -103,8 +114,8 @@ export default class DateRangeTemplate extends React.Component<IDateRangeTemplat
         }
     }
 
-    public componentWillReceiveProps(nextProps: IBaseRefinerTemplateProps) {
-        
+    public UNSAFE_componentWillReceiveProps(nextProps: IBaseRefinerTemplateProps) {
+
         if (nextProps.shouldResetFilters) {
             this.setState({
                 refinerSelectedFilterValues: [],
@@ -116,11 +127,11 @@ export default class DateRangeTemplate extends React.Component<IDateRangeTemplat
         // Remove an arbitrary value from the inner state
         // Useful when the remove filter action is also present in the parent control
         if (nextProps.removeFilterValue) {
-            
+
             const newFilterValues = this.state.refinerSelectedFilterValues.filter((elt) => {
                 return elt.RefinementToken !== nextProps.removeFilterValue.RefinementToken;
             });
-    
+
             this.setState({
                 refinerSelectedFilterValues: newFilterValues,
                 selectedFromDate: null,
@@ -168,9 +179,9 @@ export default class DateRangeTemplate extends React.Component<IDateRangeTemplat
 
             if (endDate.localeCompare('max') !== 0) {
                 filterDisplayValue.push(`< ${this._onFormatDate(new Date(endDate))}`);
-            } 
+            }
         }
-        
+
         const refinementValue: IRefinementValue = {
             RefinementCount: 0,
             RefinementName: this.props.refinementResult.FilterName,
@@ -180,10 +191,10 @@ export default class DateRangeTemplate extends React.Component<IDateRangeTemplat
 
         if (this.state.refinerSelectedFilterValues.length > 0) {
             // Replace the value
-            updatedValues = update(this.state.refinerSelectedFilterValues, { [0]: { $set: refinementValue }});
+            updatedValues = update(this.state.refinerSelectedFilterValues, { [0]: { $set: refinementValue } });
         } else {
             // Check if the value already exists
-            updatedValues = update(this.state.refinerSelectedFilterValues, {$push: [refinementValue]});
+            updatedValues = update(this.state.refinerSelectedFilterValues, { $push: [refinementValue] });
         }
 
         this.setState({
@@ -205,6 +216,8 @@ export default class DateRangeTemplate extends React.Component<IDateRangeTemplat
     }
 
     private _onFormatDate(date: Date): string {
-        return (window as any).searchHBHelper.moment(date, "LL", { lang: this.props.language });
+        if ((window as any).searchHBHelper) {
+            return (window as any).searchMoment(date).locale(this.props.language).format('LL');
+        }
     }
 }

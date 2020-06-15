@@ -1,5 +1,4 @@
 declare interface ISearchNavigationWebPartStrings {
-  DynamicFieldSetLabel: string;
   DynamicFieldLabel: string;
   NavNodeLabel: string;
   NavNodeHeader: string;
@@ -8,6 +7,23 @@ declare interface ISearchNavigationWebPartStrings {
   NavNodeUrlFieldLabel: string;
   ColorPickerLabel: string;
   UseThemeColorLabel: string;
+  PlaceHolderEditLabel: string;
+  PlaceHolderConfigureBtnLabel: string;
+  PlaceHolderIconText: string;
+  PlaceHolderDescription: string;
+  UseNlpValueLabel: string;
+  PassQueryLabel: string;
+  SearchBoxQueryPathBehaviorLabel: string;
+  SearchBoxUrlFragmentQueryPathBehavior: string;
+  SearchBoxQueryStringQueryPathBehavior: string;
+  SearchBoxQueryStringParameterName: string;
+  SearchBoxQueryParameterNotEmpty: string;
+  SearchNavigationDataSettings: string;
+  SearchNavigationColorSettings: string;
+  SearchNavigationQueryPathBehaviorSettings: string;
+  SearchBoxSameTabOpenBehavior: string;
+  SearchBoxNewTabOpenBehavior: string;
+  SearchBoxPageOpenBehaviorLabel: string;
 }
 
 declare module 'SearchNavigationWebPartStrings' {

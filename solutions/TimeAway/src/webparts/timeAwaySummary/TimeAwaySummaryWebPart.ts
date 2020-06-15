@@ -4,11 +4,8 @@
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
 import { Version, Environment, EnvironmentType } from '@microsoft/sp-core-library';
-import {
-  BaseClientSideWebPart,
-  IPropertyPaneConfiguration,
-  PropertyPaneToggle
-} from '@microsoft/sp-webpart-base';
+import { BaseClientSideWebPart } from "@microsoft/sp-webpart-base";
+import { IPropertyPaneConfiguration, PropertyPaneToggle } from "@microsoft/sp-property-pane";
 
 import TimeAwaySummaryContainer from './components/Container/TimeAwaySummaryContainer';
 import ITimeAwaySummaryContainerProps from './components/Container/ITimeAwaySummaryContainerProps';
@@ -19,6 +16,7 @@ import MockTimeAwaySummaryProvider from './dataProviders/MockTimeAwaySummaryProv
 import {
     Constants, WeekType, TimeAwayManager, SharePointDataProvider, MockDataProvider, IMyTimeAwayDataProvider
 } from '../../libraries/index';
+import { sp } from '../../pnp-preset';
 
 export default class TimeAwaySummaryWebPart extends BaseClientSideWebPart<ITimeAwaySummaryWebPartProps> {
   private _dataProvider: ITimeAwaySummaryDataProvider;
@@ -46,6 +44,7 @@ export default class TimeAwaySummaryWebPart extends BaseClientSideWebPart<ITimeA
 
 
   protected async onInit(): Promise<void> {
+    sp.setup(this.context);
     this.context.statusRenderer.displayLoadingIndicator(this.domElement, "Loading List");
     if (Environment.type === EnvironmentType.Local) {
       this._dataProvider = new MockTimeAwaySummaryProvider(this.properties, this.context);
@@ -54,8 +53,8 @@ export default class TimeAwaySummaryWebPart extends BaseClientSideWebPart<ITimeA
       return super.onInit();
     } 
     else {
-      this._dataProvider = new TimeAwaySummaryDataProvider(this.properties, this.context);
-      this._myTimeAwaydataProvider = new SharePointDataProvider(this.context, Constants.TimeAwayListTitle, true, Constants.Default_TimePeriod);
+      this._dataProvider = new TimeAwaySummaryDataProvider();
+      this._myTimeAwaydataProvider = new SharePointDataProvider(Constants.TimeAwayListTitle, true, Constants.Default_TimePeriod);
 
       return TimeAwayManager
         .checkSPListTimeAway(this.context)
